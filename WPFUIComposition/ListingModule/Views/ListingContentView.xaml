@@ -1,0 +1,121 @@
+﻿<UserControl x:Class="ListingModule.Views.ListingContentView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mvvm="http://prismlibrary.com/"
+             mvvm:ViewModelLocator.AutoWireViewModel="True"
+             mc:Ignorable="d" 
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:ei="clr-namespace:Microsoft.Expression.Interactivity.Core;assembly=Microsoft.Expression.Interactions"
+             xmlns:vm="clr-namespace:ListingModule.ViewModels"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded" >
+            <ei:CallMethodAction MethodName="Initialize" TargetObject="{Binding}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <UserControl.Resources>
+        <!--<CollectionViewSource x:Key="CVS" >
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="AKVName"/>
+            </CollectionViewSource.GroupDescriptions>
+        </CollectionViewSource>-->
+
+        <Style x:Key="GroupHeaderStyle" TargetType="{x:Type GroupItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type GroupItem}">
+                        <Expander IsExpanded="True">
+                            <Expander.Header>
+                                <!--<StackPanel Orientation="Horizontal">-->
+                                <TextBlock Text="{Binding AKVName}"/>
+                                <!--</StackPanel>-->
+                            </Expander.Header>
+                            <ItemsPresenter />
+                        </Expander>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="OpenItemsItemTemplate">
+            <StackPanel Orientation="Vertical" Width="auto">
+                <TextBlock Text="{Binding Header}" HorizontalAlignment="Left"/>
+                <ContentControl Content="{Binding OpenItems}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AKVOpenItems}">
+            <StackPanel Orientation="Horizontal">
+                <ListView ItemsSource="{Binding OpenItems}">
+                    <ListView.GroupStyle>
+                        <!-- Style for groups at top level. -->
+                        <GroupStyle>
+                            <GroupStyle.ContainerStyle>
+                                <Style TargetType="{x:Type GroupItem}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type GroupItem}" >
+                                                <Expander IsExpanded="True" Background="#FF112255" BorderBrush="#FF002255" Foreground="#FFEEEEEE" BorderThickness="1,1,1,5">
+                                                    <Expander.Header>
+                                                        <DockPanel>
+                                                            <TextBlock FontWeight="Bold" Text="{Binding Path=Items[0].Items[0].AKVName}" /> 
+                                                        </DockPanel>
+                                                    </Expander.Header>
+                                                    <Expander.Content>
+                                                        <ItemsPresenter />
+                                                    </Expander.Content>
+                                                </Expander>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </GroupStyle.ContainerStyle>
+                        </GroupStyle>
+                        <!-- Style for groups under the top level. -->
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <DockPanel Background="LightBlue">
+                                        <StackPanel Orientation="Vertical">
+                                            <TextBlock Text="{Binding Path=Items[0].FunctionName}" FontWeight="Bold" VerticalAlignment="Bottom"  Margin="5,0,0,0"/>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListView.GroupStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Path=ID}" />
+                            <GridViewColumn Header="Message" DisplayMemberBinding="{Binding Path=Message}" />
+                            <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Path=ActionTaken}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:UserOpenItems}">
+            <StackPanel Orientation="Vertical">
+                <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding OpenItems}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:TicketOpenItems}">
+            <StackPanel Orientation="Vertical">
+                <DataGrid AutoGenerateColumns="True" ItemsSource="{Binding OpenItems}"/>
+            </StackPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <StackPanel>
+            <TextBox Width="100" Text="{Binding TotalItems, FallbackValue=5}" VerticalAlignment="Center" HorizontalAlignment="Center" >
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="LostFocus" >
+                        <ei:CallMethodAction MethodName="ReloadContent" TargetObject="{Binding}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBox>
+            <ListBox ItemsSource="{Binding OpenItemsCollection}" ItemTemplate="{StaticResource OpenItemsItemTemplate}"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
